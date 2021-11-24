@@ -5,6 +5,9 @@ let AALib = document.createElement("script")
 let scaler = 1
 let rate = 1
 let yPos = 0
+let xRange = 200
+let yRange = 200
+let items = []
 
 AALib.setAttribute("src", "AA/pile-lib.js")
 document.body.appendChild(AALib)
@@ -21,47 +24,86 @@ function kickoff() {
   container.scaleX = scaler
   container.scaleY = scaler
 
-  makeMulge()
-  makeMulge()
-  makeMulge()
-  makeMulge()
+  items = _.times(5, makeMulge)
 
   cjs.Ticker.framerate = 30
   createjs.Ticker.addEventListener("tick", tick)
 }
 
 function tick(e) {  
-  console.log('tick')
+  // console.log('tick')
   stage.update()
 }
 
-function makeMulge() {
-  let mulge = new lib.Mulge()
+function makeMulge(index) {
+  let item = new lib.Mulge()
   let forward = true
 
-  mulge.gotoAndStop(Math.floor(fxrand()*mulge.totalFrames))
 
-  mulge.addEventListener('tick', e => {
+  item.addEventListener('tick', e => {
     if (forward) {
-      mulge.gotoAndStop(mulge.currentFrame+rate)
+      item.gotoAndStop(item.currentFrame+rate)
     } else {
-      mulge.gotoAndStop(mulge.currentFrame-rate)
+      item.gotoAndStop(item.currentFrame-rate)
     }
-    if (mulge.currentFrame >= mulge.totalFrames - rate && forward) {
+    if (item.currentFrame >= item.totalFrames - rate && forward) {
       forward = false
-      // mulges.splice(index, rate)
-      // mulge.removeEventListener('tick')
-      // container.removeChild(mulge)
-    } else if (mulge.currentFrame <= 0 && !forward) {
+      // items.splice(index, rate)
+      // item.removeEventListener('tick')
+      // container.removeChild(item)
+    } else if (item.currentFrame <= 0 && !forward) {
       forward = true
     }
   })
-  mulge.x = fxrand() * 300 - fxrand() * 300
-  mulge.y = yPos
-  yPos += 50
-  container.addChild(mulge)
-  mulge.rotation = Math.random()*360
-  return mulge
+  item.x = fxrand() * xRange - fxrand() * xRange
+  item.y = fxrand() * yRange - fxrand() * yRange
+  item.scaleX = fxrand() < 0.4 ? 1 : -1
+  yPos += 20
+  item.rotation = Math.random()*360
+
+  recolorFill(item, "#00ff00")
+
+//   if (index === 0) {
+//     console.log('first', item)
+//     item.alpha = 0.5
+//     // item.shape_5.graphics._fill.style = "#00ff00"
+
+// //item.totalFrames-1
+
+//     console.log("loggy", item)
+
+//     // _.delay(function(text) {
+//       _.times(item.totalFrames, frameIndex => {
+//         // let shapeName = frameIndex === 0 ? "shape" : "shape_" + frameIndex
+//         // if (frameIndex > 0) {
+//         //   console.log("shapeName: ", shapeName)
+//         //   item[shapeName].graphics._fill.style = "#00ff00"
+//         // }
+//         item.gotoAndStop(frameIndex) 
+//         console.log(item.children[0])
+//         item.children[0].graphics._fill.style = "#00ff00"
+//         // item[shapeName].graphics._fill.style = "#00ff00"
+//         // console.log("loggy", item[shapeName].graphics._fill.style)
+//         // console.log("frame: ", frameIndex, "shape_"+frameIndex)
+//         // console.log("frame: ", item["shape_"+frameIndex])
+//       })
+
+//     // }, 3000, 'later');
+
+//   }
+  item.gotoAndStop(Math.floor(fxrand()*item.totalFrames))
+  container.addChildAt(item, 0)
+
+  return item
+}
+
+
+function recolorFill(item, color) {
+  _.times(item.totalFrames, frameIndex => {
+    item.gotoAndStop(frameIndex) 
+    console.log(item.children[0])
+    item.children[0].graphics._fill.style = color
+  })
 }
 
 
