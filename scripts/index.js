@@ -20,7 +20,6 @@ AALib.addEventListener("load", () => {
 
 function kickoff() {
   console.log('kickoff: ', lib)
-  console.log('underscore: ', _.capitalize('FRED'))
   container.scaleX = scaler
   container.scaleY = scaler
 
@@ -39,7 +38,6 @@ function makeMulge(index) {
   let item = new lib.Mulge()
   let forward = true
 
-
   item.addEventListener('tick', e => {
     if (forward) {
       item.gotoAndStop(item.currentFrame+rate)
@@ -48,9 +46,6 @@ function makeMulge(index) {
     }
     if (item.currentFrame >= item.totalFrames - rate && forward) {
       forward = false
-      // items.splice(index, rate)
-      // item.removeEventListener('tick')
-      // container.removeChild(item)
     } else if (item.currentFrame <= 0 && !forward) {
       forward = true
     }
@@ -61,36 +56,17 @@ function makeMulge(index) {
   yPos += 20
   item.rotation = Math.random()*360
 
-  recolorFill(item, "#00ff00")
+  let color = "#00ff00"
 
-//   if (index === 0) {
-//     console.log('first', item)
-//     item.alpha = 0.5
-//     // item.shape_5.graphics._fill.style = "#00ff00"
+  let colorShiftRange = 5
+  let colorShiftAmount = fxrand()/colorShiftRange - fxrand()/colorShiftRange
 
-// //item.totalFrames-1
+  color = pSBC(colorShiftAmount, color)
+  let strokeColor = pSBC(-0.4, color)
 
-//     console.log("loggy", item)
+  recolorFill(item, color)
+  recolorStroke(item, strokeColor)
 
-//     // _.delay(function(text) {
-//       _.times(item.totalFrames, frameIndex => {
-//         // let shapeName = frameIndex === 0 ? "shape" : "shape_" + frameIndex
-//         // if (frameIndex > 0) {
-//         //   console.log("shapeName: ", shapeName)
-//         //   item[shapeName].graphics._fill.style = "#00ff00"
-//         // }
-//         item.gotoAndStop(frameIndex) 
-//         console.log(item.children[0])
-//         item.children[0].graphics._fill.style = "#00ff00"
-//         // item[shapeName].graphics._fill.style = "#00ff00"
-//         // console.log("loggy", item[shapeName].graphics._fill.style)
-//         // console.log("frame: ", frameIndex, "shape_"+frameIndex)
-//         // console.log("frame: ", item["shape_"+frameIndex])
-//       })
-
-//     // }, 3000, 'later');
-
-//   }
   item.gotoAndStop(Math.floor(fxrand()*item.totalFrames))
   container.addChildAt(item, 0)
 
@@ -101,8 +77,14 @@ function makeMulge(index) {
 function recolorFill(item, color) {
   _.times(item.totalFrames, frameIndex => {
     item.gotoAndStop(frameIndex) 
-    console.log(item.children[0])
     item.children[0].graphics._fill.style = color
+  })
+}
+
+function recolorStroke(item, color) {
+  _.times(item.totalFrames, frameIndex => {
+    item.gotoAndStop(frameIndex) 
+    item.children[1].graphics._stroke.style = color
   })
 }
 
