@@ -43,9 +43,13 @@
     </script>
 
     <script>
+
       let cjs = createjs
       let canvas = document.getElementById("cjs-canvas")
       let stage = new cjs.Stage(canvas)
+
+      let context = stage.canvas.getContext("2d");
+      context.imageSmoothingEnabled = false;
 
       let container = new cjs.Container()
       stage.addChild(container)
@@ -76,6 +80,7 @@
       
       window.onresize = onResize
       onResize()
+
     </script>
     <script type="module" src="scripts/index.js"></script>
   </body>

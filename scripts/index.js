@@ -5,37 +5,74 @@ let AALib = document.createElement("script")
 let scaler = 1
 let rate = 1
 let yPos = 0
-let xRange = 200
-let yRange = 200
+let xMoveRange = 300
+let yMoveRange = 200
 let items = []
+let arrPosX = 0
+let arrPosY = 300
+let maxItems = 5
+let minItems = 5
+let numItems = Math.floor(fxrand()*maxItems)+minItems
+let pulsorID = 0
+let xMoveRangeIncrement = xMoveRange / numItems
+
+let colorschemes = [
+
+  ["590d22","800f2f","a4133c","c9184a","ff4d6d","ff758f","d2fd35","ffccd5","fff0f3"],
+  ["d8f3dc","b7e4c7","ff0a50","74c69d","52b788","40916c","2d6a4f","1b4332","081c15"],
+  ["007f5f","2b9348","55a630","80b918","aacc00","bfd200","eb4833","eeef20","ffff3f"]
+
+]
+
+function fxSample(array) {
+  return array[Math.floor(Math.random()*array.length)]
+}
+
+
+let colorScheme = _.sample(colorschemes)
+
+let color = "#"+fxSample(colorScheme)
+
 
 AALib.setAttribute("src", "AA/pile-lib.js")
 document.body.appendChild(AALib)
 AALib.addEventListener("load", () => {
-  // needs to have explicit knowledge of this ID?
   let comp=AdobeAn.getComposition("9DDB8738695F40A58CB0CE0618646207")
   lib=comp.getLibrary()
   kickoff()
 }, false)
 
 function kickoff() {
-  console.log('kickoff: ', lib)
+  console.log('color: ', color)
   container.scaleX = scaler
   container.scaleY = scaler
 
-  items = _.times(5, makeMulge)
+
+  let graphics = new createjs.Graphics().beginFill("#"+fxSample(colorScheme)).drawRect(0, 0, 10000, 10000);
+  let shape = new createjs.Shape(graphics);
+  shape.x = -5000
+  shape.y = -5000
+  container.addChild(shape)
+
+
+  items = _.times(numItems, makePulsor)
 
   cjs.Ticker.framerate = 30
   createjs.Ticker.addEventListener("tick", tick)
 }
 
 function tick(e) {  
-  // console.log('tick')
   stage.update()
 }
 
-function makeMulge(index) {
-  let item = new lib.Mulge()
+function makePulsor(index) {
+  if (fxrand()<0.4) {
+    pulsorID = Math.floor(fxrand()*2)
+    color = "#"+fxSample(colorScheme)
+  }
+  let className = "Pulsor"+ pulsorID
+
+  let item = new lib[className]()
   let forward = true
 
   item.addEventListener('tick', e => {
@@ -50,13 +87,18 @@ function makeMulge(index) {
       forward = true
     }
   })
-  item.x = fxrand() * xRange - fxrand() * xRange
-  item.y = fxrand() * yRange - fxrand() * yRange
+  item.x = fxrand() * xMoveRange - fxrand() * xMoveRange
+  item.y = arrPosY
+  console.log("arrPosX, arrPosY: ", arrPosX, arrPosY)
+  arrPosX += fxrand() * xMoveRange - fxrand() * xMoveRange
+  xMoveRange -= xMoveRangeIncrement
+  arrPosY -= 20
   item.scaleX = fxrand() < 0.4 ? 1 : -1
   yPos += 20
-  item.rotation = Math.random()*360
+  item.rotation = fxrand()*360
 
-  let color = "#00ff00"
+  // let color = "#00ff00"
+  // let color = "#00ff00"
 
   let colorShiftRange = 5
   let colorShiftAmount = fxrand()/colorShiftRange - fxrand()/colorShiftRange
@@ -68,7 +110,7 @@ function makeMulge(index) {
   recolorStroke(item, strokeColor)
 
   item.gotoAndStop(Math.floor(fxrand()*item.totalFrames))
-  container.addChildAt(item, 0)
+  container.addChildAt(item, 1)
 
   return item
 }
@@ -87,6 +129,7 @@ function recolorStroke(item, color) {
     item.children[1].graphics._stroke.style = color
   })
 }
+
 
 
 
