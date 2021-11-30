@@ -5,22 +5,28 @@ let AALib = document.createElement("script")
 let scaler = 1
 let rate = 1
 let yPos = 0
-let xMoveRange = 300
-let yMoveRange = 200
+let xMoveRange = 0
+let yMoveRange = 0
 let items = []
 let arrPosX = 0
-let arrPosY = 300
+let arrPosY = 100
 let maxItems = 5
 let minItems = 5
 let numItems = Math.floor(fxrand()*maxItems)+minItems
 let pulsorID = 0
 let xMoveRangeIncrement = xMoveRange / numItems
+let rotationRateMax = 0.5
 
 let colorschemes = [
 
   ["590d22","800f2f","a4133c","c9184a","ff4d6d","ff758f","d2fd35","ffccd5","fff0f3"],
   ["d8f3dc","b7e4c7","ff0a50","74c69d","52b788","40916c","2d6a4f","1b4332","081c15"],
-  ["007f5f","2b9348","55a630","80b918","aacc00","bfd200","eb4833","eeef20","ffff3f"]
+  ["007f5f","2b9348","55a630","80b918","aacc00","bfd200","eb4833","eeef20","ffff3f"],
+  ["0d1f2d","546a7b","9ea3b0","fae1df","e4c3ad","6d2e46","ffe74c","ff5964","f9db6d"],
+  ["bbe1c3","a7cdbd","869d7a","91785d","8b5d33","433e0e","e0b0d5","ffa552","ba5624"],
+  ["9a8f97","c3baba","e9e3e6","b2b2b2","736f72","a30b37","40bcd8","355070","49beaa"],
+  ["985f99","9684a1","aaacb0","b6c9bb","bfedc1","2d0320","0d160b","5c1a1b","5c573e"],
+  ["ffd9da","ea638c","89023e","30343f","1b2021","93b7be","798071","623cea","16302b"]
 
 ]
 
@@ -32,6 +38,7 @@ function fxSample(array) {
 let colorScheme = _.sample(colorschemes)
 
 let color = "#"+fxSample(colorScheme)
+let nestedColor = "#"+fxSample(colorScheme)
 
 
 AALib.setAttribute("src", "AA/pile-lib.js")
@@ -68,12 +75,20 @@ function tick(e) {
 function makePulsor(index) {
   if (fxrand()<0.4) {
     pulsorID = Math.floor(fxrand()*2)
-    color = "#"+fxSample(colorScheme)
+    // color = "#"+fxSample(colorScheme)
   }
-  let className = "Pulsor"+ pulsorID
+  // let className = "Pulsor"+ pulsorID
+  // let className = "Pulsor)"
 
-  let item = new lib[className]()
+  let item = new lib.Pulsor0()
+
+ 
+
+  // console.log("aasdasd: ", item)
+
   let forward = true
+
+  let rotationRate = fxrand()*rotationRateMax - fxrand()*rotationRateMax
 
   item.addEventListener('tick', e => {
     if (forward) {
@@ -86,15 +101,17 @@ function makePulsor(index) {
     } else if (item.currentFrame <= 0 && !forward) {
       forward = true
     }
+    item.rotation += rotationRate
   })
+
   item.x = fxrand() * xMoveRange - fxrand() * xMoveRange
-  item.y = arrPosY
+  item.y = fxrand() * yMoveRange - fxrand() * yMoveRange
   console.log("arrPosX, arrPosY: ", arrPosX, arrPosY)
-  arrPosX += fxrand() * xMoveRange - fxrand() * xMoveRange
-  xMoveRange -= xMoveRangeIncrement
-  arrPosY -= 20
+  // arrPosX += fxrand() * xMoveRange - fxrand() * xMoveRange
+  // xMoveRange -= xMoveRangeIncrement
+  // arrPosY -= 20
   item.scaleX = fxrand() < 0.4 ? 1 : -1
-  yPos += 20
+  // yPos += 20
   item.rotation = fxrand()*360
 
   // let color = "#00ff00"
@@ -108,12 +125,44 @@ function makePulsor(index) {
 
   recolorFill(item, color)
   recolorStroke(item, strokeColor)
+  setStrokeWidth(item, 2)
 
   item.gotoAndStop(Math.floor(fxrand()*item.totalFrames))
   container.addChildAt(item, 1)
 
+
+  let nestedItem = new lib.Pulsor1()
+  nestedItem.scaleX = nestedItem.scaleY = 0.5
+  nestedColor = pSBC(colorShiftAmount, nestedColor)
+  let nestedStrokeColor = pSBC(-0.4, nestedColor)
+  recolorFill(nestedItem, nestedColor)
+  recolorStroke(nestedItem, nestedStrokeColor)
+  setStrokeWidth(nestedItem, 4)
+
+
+  let nestedForward = true
+  nestedItem.addEventListener('tick', e => {
+    if (nestedForward) {
+      nestedItem.gotoAndStop(nestedItem.currentFrame+rate)
+    } else {
+      nestedItem.gotoAndStop(nestedItem.currentFrame-rate)
+    }
+    if (nestedItem.currentFrame >= nestedItem.totalFrames - rate && nestedForward) {
+      nestedForward = false
+    } else if (nestedItem.currentFrame <= 0 && !nestedForward) {
+      nestedForward = true
+    }
+    // nestedItem.rotation += rotationRate
+  })
+
+
+  item.anchor1.addChild(nestedItem)
+
+
   return item
 }
+
+
 
 
 function recolorFill(item, color) {
@@ -130,6 +179,12 @@ function recolorStroke(item, color) {
   })
 }
 
+function setStrokeWidth(item, width) {
+  _.times(item.totalFrames, frameIndex => {
+    item.gotoAndStop(frameIndex) 
+    item.children[1].graphics._strokeStyle.width = width
+  })
+}
 
 
 
