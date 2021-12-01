@@ -50,16 +50,15 @@ AALib.addEventListener("load", () => {
 }, false)
 
 function kickoff() {
-  console.log('color: ', color)
-  container.scaleX = scaler
-  container.scaleY = scaler
-
 
   let graphics = new createjs.Graphics().beginFill("#"+fxSample(colorScheme)).drawRect(0, 0, 10000, 10000);
   let shape = new createjs.Shape(graphics);
   shape.x = -5000
   shape.y = -5000
   container.addChild(shape)
+  let frameGraphics = new cjs.Graphics().beginStroke("white").drawRect(-350, -350, 700, 700)
+  let frameShape = new cjs.Shape(frameGraphics)
+  container.addChild(frameShape)
 
 
   items = _.times(numItems, makePulsor)
@@ -131,7 +130,7 @@ function makePulsor(index) {
   container.addChildAt(item, 1)
 
 
-  let nestedItem = new lib.Pulsor1()
+  let nestedItem = new lib.Pulsor0()
   nestedItem.scaleX = nestedItem.scaleY = 0.5
   nestedColor = pSBC(colorShiftAmount, nestedColor)
   let nestedStrokeColor = pSBC(-0.4, nestedColor)

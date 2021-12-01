@@ -47,6 +47,8 @@
       let cjs = createjs
       let canvas = document.getElementById("cjs-canvas")
       let stage = new cjs.Stage(canvas)
+      let scaler = 1
+      let scaleBound = 700
 
       let context = stage.canvas.getContext("2d");
       context.imageSmoothingEnabled = false;
@@ -57,6 +59,13 @@
       let onResize = () => {
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
+        scaler = 1
+        if (canvas.width < scaleBound || canvas.height < scaleBound) { 
+          let smallestScaleSize = canvas.width < canvas.height ? canvas.width : canvas.height
+          scaler = smallestScaleSize / scaleBound
+        }
+        container.scaleX = scaler
+        container.scaleY = scaler
         container.x = canvas.width / 2
         container.y = canvas.height / 2
         retinalize()
