@@ -76,6 +76,18 @@ function kickoff() {
 
   cjs.Ticker.framerate = 30
   createjs.Ticker.addEventListener("tick", tick)
+
+
+  // // BITMAP OVERLAY FAILED ATTEMPT
+  // var bitmap = new createjs.Bitmap("images/scanlines1.png")
+  // var g = new createjs.Graphics()
+  // g.beginBitmapFill(bitmap.image)
+  // g.drawCircle(0,0,300)
+  // var s = new createjs.Shape(g);
+  // s.x = container.x;
+  // s.y = container.y;
+  // stage.addChild(s);
+
 }
 
 function tick(e) {  
@@ -107,7 +119,7 @@ function makePulsor(index) {
   setStrokeWidth(item, 2)
 
   item.gotoAndStop(Math.floor(fxrand()*item.totalFrames))
-  
+
   // console.log("aasdasd: ", item)
 
   let forward = true
