@@ -1,5 +1,14 @@
 "use strict"
 
+///////////////////////////
+// UTILS
+
+function fxSample(arr) {
+  return arr[Math.floor(fxrand()*arr.length)]
+}
+
+///////////////////////////
+
 let lib
 let AALib = document.createElement("script")
 let scaler = 1
@@ -17,6 +26,14 @@ let pulsorID = 0
 let xMoveRangeIncrement = xMoveRange / numItems
 let rotationRateMax = 0.5
 
+let assets = [
+  {name: "Looper0", playhead: "loop"},
+  {name: "Pulsor0", playhead: "pingpong"},
+  {name: "Pulsor1", playhead: "pingpong"},
+]
+
+// console.log("sample: ", _.sample(assets))
+
 let colorschemes = [
 
   ["590d22","800f2f","a4133c","c9184a","ff4d6d","ff758f","d2fd35","ffccd5","fff0f3"],
@@ -30,15 +47,10 @@ let colorschemes = [
 
 ]
 
-function fxSample(array) {
-  return array[Math.floor(Math.random()*array.length)]
-}
+let colorScheme = fxSample(colorschemes)
 
-
-let colorScheme = _.sample(colorschemes)
-
-let color = "#"+fxSample(colorScheme)
-let nestedColor = "#"+fxSample(colorScheme)
+let color = "#" + fxSample(colorScheme)
+let nestedColor = "#" + fxSample(colorScheme)
 
 
 AALib.setAttribute("src", "AA/pile-lib.js")
@@ -56,10 +68,9 @@ function kickoff() {
   shape.x = -5000
   shape.y = -5000
   container.addChild(shape)
-  let frameGraphics = new cjs.Graphics().beginStroke("white").drawRect(-350, -350, 700, 700)
-  let frameShape = new cjs.Shape(frameGraphics)
-  container.addChild(frameShape)
-
+  // let frameGraphics = new cjs.Graphics().beginStroke("white").drawRect(-350, -350, 700, 700)
+  // let frameShape = new cjs.Shape(frameGraphics)
+  // container.addChild(frameShape)
 
   items = _.times(numItems, makePulsor)
 
@@ -72,49 +83,18 @@ function tick(e) {
 }
 
 function makePulsor(index) {
-  if (fxrand()<0.4) {
-    pulsorID = Math.floor(fxrand()*2)
-    // color = "#"+fxSample(colorScheme)
-  }
+  // if (fxrand()<0.4) {
+  //   pulsorID = Math.floor(fxrand()*2)
+  //   // color = "#"+fxSample(colorScheme)
+  // }
   // let className = "Pulsor"+ pulsorID
   // let className = "Pulsor)"
 
-  let item = new lib.Pulsor0()
 
- 
+  // let itemData = fxSample(assets)
+  let itemData = assets[1]
 
-  // console.log("aasdasd: ", item)
-
-  let forward = true
-
-  let rotationRate = fxrand()*rotationRateMax - fxrand()*rotationRateMax
-
-  item.addEventListener('tick', e => {
-    if (forward) {
-      item.gotoAndStop(item.currentFrame+rate)
-    } else {
-      item.gotoAndStop(item.currentFrame-rate)
-    }
-    if (item.currentFrame >= item.totalFrames - rate && forward) {
-      forward = false
-    } else if (item.currentFrame <= 0 && !forward) {
-      forward = true
-    }
-    item.rotation += rotationRate
-  })
-
-  item.x = fxrand() * xMoveRange - fxrand() * xMoveRange
-  item.y = fxrand() * yMoveRange - fxrand() * yMoveRange
-  console.log("arrPosX, arrPosY: ", arrPosX, arrPosY)
-  // arrPosX += fxrand() * xMoveRange - fxrand() * xMoveRange
-  // xMoveRange -= xMoveRangeIncrement
-  // arrPosY -= 20
-  item.scaleX = fxrand() < 0.4 ? 1 : -1
-  // yPos += 20
-  item.rotation = fxrand()*360
-
-  // let color = "#00ff00"
-  // let color = "#00ff00"
+  let item = new lib[itemData.name]()
 
   let colorShiftRange = 5
   let colorShiftAmount = fxrand()/colorShiftRange - fxrand()/colorShiftRange
@@ -127,34 +107,72 @@ function makePulsor(index) {
   setStrokeWidth(item, 2)
 
   item.gotoAndStop(Math.floor(fxrand()*item.totalFrames))
+  
+  // console.log("aasdasd: ", item)
+
+  let forward = true
+
+  let rotationRate = fxrand()*rotationRateMax - fxrand()*rotationRateMax
+
+  if (itemData.playhead == "pingpong") {
+    item.addEventListener('tick', e => {
+      if (forward) {
+        item.gotoAndStop(item.currentFrame+rate)
+      } else {
+        item.gotoAndStop(item.currentFrame-rate)
+      }
+      if (item.currentFrame >= item.totalFrames - rate && forward) {
+        forward = false
+      } else if (item.currentFrame <= 0 && !forward) {
+        forward = true
+      }
+      item.rotation += rotationRate
+    })
+  } else {
+    item.play()
+  }
+
+
+
+  item.x = fxrand() * xMoveRange - fxrand() * xMoveRange
+  item.y = fxrand() * yMoveRange - fxrand() * yMoveRange
+  // arrPosX += fxrand() * xMoveRange - fxrand() * xMoveRange
+  // xMoveRange -= xMoveRangeIncrement
+  // arrPosY -= 20
+  item.scaleX = fxrand() < 0.4 ? 1 : -1
+  // yPos += 20
+  item.rotation = fxrand()*360
+
+  // let color = "#00ff00"
+  // let color = "#00ff00"
+
+
+
   container.addChildAt(item, 1)
 
-
-  let nestedItem = new lib.Pulsor0()
+  // let nestedItem = new lib.Pulsor1()
+  let nestedItem = new lib.Looper0()
   nestedItem.scaleX = nestedItem.scaleY = 0.5
   nestedColor = pSBC(colorShiftAmount, nestedColor)
   let nestedStrokeColor = pSBC(-0.4, nestedColor)
   recolorFill(nestedItem, nestedColor)
   recolorStroke(nestedItem, nestedStrokeColor)
   setStrokeWidth(nestedItem, 4)
-
-
-  let nestedForward = true
-  nestedItem.addEventListener('tick', e => {
-    if (nestedForward) {
-      nestedItem.gotoAndStop(nestedItem.currentFrame+rate)
-    } else {
-      nestedItem.gotoAndStop(nestedItem.currentFrame-rate)
-    }
-    if (nestedItem.currentFrame >= nestedItem.totalFrames - rate && nestedForward) {
-      nestedForward = false
-    } else if (nestedItem.currentFrame <= 0 && !nestedForward) {
-      nestedForward = true
-    }
-    // nestedItem.rotation += rotationRate
-  })
-
-
+  nestedItem.play()
+  // let nestedForward = true
+  // nestedItem.addEventListener('tick', e => {
+  //   if (nestedForward) {
+  //     nestedItem.gotoAndStop(nestedItem.currentFrame+rate)
+  //   } else {
+  //     nestedItem.gotoAndStop(nestedItem.currentFrame-rate)
+  //   }
+  //   if (nestedItem.currentFrame >= nestedItem.totalFrames - rate && nestedForward) {
+  //     nestedForward = false
+  //   } else if (nestedItem.currentFrame <= 0 && !nestedForward) {
+  //     nestedForward = true
+  //   }
+  //   // nestedItem.rotation += rotationRate
+  // })
   item.anchor1.addChild(nestedItem)
 
 
