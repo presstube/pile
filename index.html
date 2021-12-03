@@ -59,13 +59,13 @@
       let onResize = () => {
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
-        scaler = 1
-        if (canvas.width < scaleBound || canvas.height < scaleBound) { 
-          let smallestScaleSize = canvas.width < canvas.height ? canvas.width : canvas.height
-          scaler = smallestScaleSize / scaleBound
-        }
-        container.scaleX = scaler
-        container.scaleY = scaler
+        // scaler = 1
+        // if (canvas.width < scaleBound || canvas.height < scaleBound) { 
+        //   let smallestScaleSize = canvas.width < canvas.height ? canvas.width : canvas.height
+        //   scaler = smallestScaleSize / scaleBound
+        // }
+        // container.scaleX = scaler
+        // container.scaleY = scaler
         container.x = canvas.width / 2
         container.y = canvas.height / 2
 

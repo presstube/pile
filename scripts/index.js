@@ -14,25 +14,32 @@ let AALib = document.createElement("script")
 let scaler = 1
 let rate = 1
 let yPos = 0
-let xMoveRange = 0
-let yMoveRange = 0
+let xMoveRange = 100
+let yMoveRange = 100
 let items = []
 let arrPosX = 0
-let arrPosY = 100
+let arrPosY = 0
 let maxItems = 5
 let minItems = 5
 let numItems = Math.floor(fxrand()*maxItems)+minItems
-let pulsorID = 0
 let xMoveRangeIncrement = xMoveRange / numItems
 let rotationRateMax = 0.5
 
-let assets = [
-  {name: "Looper0", playhead: "loop"},
-  {name: "Pulsor0", playhead: "pingpong"},
-  {name: "Pulsor1", playhead: "pingpong"},
+let primaryAssetData = [
+  {name: "Pulsor0", playhead: "pingpong", fill: true, stroke:true},
 ]
 
-// console.log("sample: ", _.sample(assets))
+let secondaryAssetData = [
+  {name: "Looper0", playhead: "loop", fill: true, stroke:true},
+  {name: "Pulsor1", playhead: "pingpong", fill: true, stroke:true},
+  {name: "Looper1", playhead: "loop", fill: false, stroke:true},
+  {name: "Looper2", playhead: "loop", fill: true, stroke:false},
+  {name: "Looper3", playhead: "loop", fill: true, stroke:false},
+]
+
+let assetID = Math.floor(fxrand()*primaryAssetData.length)
+
+
 
 let colorschemes = [
 
@@ -43,7 +50,15 @@ let colorschemes = [
   ["bbe1c3","a7cdbd","869d7a","91785d","8b5d33","433e0e","e0b0d5","ffa552","ba5624"],
   ["9a8f97","c3baba","e9e3e6","b2b2b2","736f72","a30b37","40bcd8","355070","49beaa"],
   ["985f99","9684a1","aaacb0","b6c9bb","bfedc1","2d0320","0d160b","5c1a1b","5c573e"],
-  ["ffd9da","ea638c","89023e","30343f","1b2021","93b7be","798071","623cea","16302b"]
+  ["ffd9da","ea638c","89023e","30343f","1b2021","93b7be","798071","623cea","16302b"],
+  ["247ba0","70c1b3","b2dbbf","f3ffbd","ff1654","30362f","625834","da7422","8b2635"],
+  ["0e0004","31081f","6b0f1a","b91372","fa198b","b7ad99","ff4365","00d9c0","fffff3"],
+  ["7cfef0","6bffb8","2ceaa3","28965a","2a6041","090909","4b5043","a40e4c","2c2c54"],
+  ["104f55","32746d","9ec5ab","01200f","011502","885053","fe5f55","23022e","ffa69e"],
+  ["78c0e0","449dd1","192bc2","150578","0e0e52","6eeb83","e4ff1a","ffb800","ff5714"],
+  ["2d2a32","ddd92a","eae151","eeefa8","fafdf6","cc2936","6b818c","eee5e9","c7e8f3"],
+  ["4d5057","4e6e5d","4da167","3bc14a","cfcfcf","ed1c24","fdfffc","f1d302","f2e2d2"]
+
 
 ]
 
@@ -94,6 +109,19 @@ function tick(e) {
   stage.update()
 }
 
+function recolor(item, itemData, color) {
+  let tempColor = color 
+  let colorShiftRange = 5
+  let colorShiftAmount = fxrand()/colorShiftRange - fxrand()/colorShiftRange
+  tempColor = pSBC(colorShiftAmount, tempColor)
+  let strokeColor = pSBC(-0.4, tempColor)
+  if (itemData.fill) recolorFill(item, tempColor)
+  if (itemData.stroke) {
+    recolorStroke(item, strokeColor)
+    setStrokeWidth(item, 2)
+  }
+}
+
 function makePulsor(index) {
   // if (fxrand()<0.4) {
   //   pulsorID = Math.floor(fxrand()*2)
@@ -103,24 +131,29 @@ function makePulsor(index) {
   // let className = "Pulsor)"
 
 
-  // let itemData = fxSample(assets)
-  let itemData = assets[1]
+  if (fxrand() < 0.4) {
+    assetID = Math.floor(fxrand()*primaryAssetData.length)
+    
+  }
+
+
+  let itemData = primaryAssetData[assetID]
+  // let itemData = assetData[1]
 
   let item = new lib[itemData.name]()
 
-  let colorShiftRange = 5
-  let colorShiftAmount = fxrand()/colorShiftRange - fxrand()/colorShiftRange
+  recolor(item, itemData, color)
 
-  color = pSBC(colorShiftAmount, color)
-  let strokeColor = pSBC(-0.4, color)
-
-  recolorFill(item, color)
-  recolorStroke(item, strokeColor)
-  setStrokeWidth(item, 2)
+  // let tempColor = color 
+  // tempColor = pSBC(colorShiftAmount, tempColor)
+  // let strokeColor = pSBC(-0.4, tempColor)
+  // if (itemData.fill) recolorFill(item, tempColor)
+  // if (itemData.stroke) {
+  //   recolorStroke(item, strokeColor)
+  //   setStrokeWidth(item, 2)
+  // }
 
   item.gotoAndStop(Math.floor(fxrand()*item.totalFrames))
-
-  // console.log("aasdasd: ", item)
 
   let forward = true
 
@@ -138,7 +171,7 @@ function makePulsor(index) {
       } else if (item.currentFrame <= 0 && !forward) {
         forward = true
       }
-      item.rotation += rotationRate
+      // item.rotation += rotationRate
     })
   } else {
     item.play()
@@ -157,35 +190,35 @@ function makePulsor(index) {
 
   // let color = "#00ff00"
   // let color = "#00ff00"
-
-
-
   container.addChildAt(item, 1)
 
-  // let nestedItem = new lib.Pulsor1()
-  let nestedItem = new lib.Looper0()
+
+
+  let nestedItemData = fxSample(secondaryAssetData)
+  let nestedItem = new lib[nestedItemData.name]()
   nestedItem.scaleX = nestedItem.scaleY = 0.5
-  nestedColor = pSBC(colorShiftAmount, nestedColor)
-  let nestedStrokeColor = pSBC(-0.4, nestedColor)
-  recolorFill(nestedItem, nestedColor)
-  recolorStroke(nestedItem, nestedStrokeColor)
-  setStrokeWidth(nestedItem, 4)
-  nestedItem.play()
-  // let nestedForward = true
-  // nestedItem.addEventListener('tick', e => {
-  //   if (nestedForward) {
-  //     nestedItem.gotoAndStop(nestedItem.currentFrame+rate)
-  //   } else {
-  //     nestedItem.gotoAndStop(nestedItem.currentFrame-rate)
-  //   }
-  //   if (nestedItem.currentFrame >= nestedItem.totalFrames - rate && nestedForward) {
-  //     nestedForward = false
-  //   } else if (nestedItem.currentFrame <= 0 && !nestedForward) {
-  //     nestedForward = true
-  //   }
-  //   // nestedItem.rotation += rotationRate
-  // })
+  let nestedItemForward = true
+  recolor(nestedItem, nestedItemData, nestedColor)
+  nestedItem.gotoAndStop(Math.floor(fxrand()*item.totalFrames))
+  if (itemData.playhead == "pingpong") {
+    nestedItem.addEventListener('tick', e => {
+      if (nestedItemForward) {
+        nestedItem.gotoAndStop(nestedItem.currentFrame+rate)
+      } else {
+        nestedItem.gotoAndStop(nestedItem.currentFrame-rate)
+      }
+      if (nestedItem.currentFrame >= nestedItem.totalFrames - rate && nestedItemForward) {
+        nestedItemForward = false
+      } else if (nestedItem.currentFrame <= 0 && !nestedItemForward) {
+        nestedItemForward = true
+      }
+      // nestedItem.rotation += rotationRate
+    })
+  } else {
+    nestedItem.play()
+  }
   item.anchor1.addChild(nestedItem)
+
 
 
   return item
