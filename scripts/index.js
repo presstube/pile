@@ -32,9 +32,10 @@ let primaryAssetData = [
 let secondaryAssetData = [
   {name: "Looper0", playhead: "loop", fill: true, stroke:true},
   {name: "Pulsor1", playhead: "pingpong", fill: true, stroke:true},
-  {name: "Looper1", playhead: "loop", fill: false, stroke:true},
+  {name: "Constellation0", playhead: "loop", fill: false, stroke:true, pureStrokes:false},
   {name: "Looper2", playhead: "loop", fill: true, stroke:false},
   {name: "Looper3", playhead: "loop", fill: true, stroke:false},
+  {name: "Hairy0", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
 ]
 
 let assetID = Math.floor(fxrand()*primaryAssetData.length)
@@ -109,7 +110,8 @@ function tick(e) {
   stage.update()
 }
 
-function recolor(item, itemData, color) {
+function recolor(item, itemData, color, depth) {
+  depth = !depth ? 1 : depth
   let tempColor = color 
   let colorShiftRange = 5
   let colorShiftAmount = fxrand()/colorShiftRange - fxrand()/colorShiftRange
@@ -117,8 +119,8 @@ function recolor(item, itemData, color) {
   let strokeColor = pSBC(-0.4, tempColor)
   if (itemData.fill) recolorFill(item, tempColor)
   if (itemData.stroke) {
-    recolorStroke(item, strokeColor)
-    setStrokeWidth(item, 2)
+    recolorStroke(item, strokeColor, itemData.pureStrokes)
+    setStrokeWidth(item, 2*depth, itemData.pureStrokes)
   }
 }
 
@@ -195,10 +197,11 @@ function makePulsor(index) {
 
 
   let nestedItemData = fxSample(secondaryAssetData)
+  // let nestedItemData = secondaryAssetData[2]
   let nestedItem = new lib[nestedItemData.name]()
   nestedItem.scaleX = nestedItem.scaleY = 0.5
   let nestedItemForward = true
-  recolor(nestedItem, nestedItemData, nestedColor)
+  recolor(nestedItem, nestedItemData, nestedColor, 2)
   nestedItem.gotoAndStop(Math.floor(fxrand()*item.totalFrames))
   if (itemData.playhead == "pingpong") {
     nestedItem.addEventListener('tick', e => {
@@ -234,18 +237,43 @@ function recolorFill(item, color) {
   })
 }
 
-function recolorStroke(item, color) {
-  _.times(item.totalFrames, frameIndex => {
-    item.gotoAndStop(frameIndex) 
-    item.children[1].graphics._stroke.style = color
-  })
+function recolorStroke(item, color, pure) {
+  if (pure) {
+    _.times(item.children.length, childIndex => {
+      _.times(item.totalFrames, frameIndex => {
+        item.gotoAndStop(frameIndex) 
+        item.children[childIndex].graphics._stroke.style = color
+      })
+    })
+  } else {
+    _.times(item.totalFrames, frameIndex => {
+      item.gotoAndStop(frameIndex) 
+      item.children[1].graphics._stroke.style = color
+    })
+  }
+  console.log("chasdoij", item.children)
+
 }
 
-function setStrokeWidth(item, width) {
-  _.times(item.totalFrames, frameIndex => {
-    item.gotoAndStop(frameIndex) 
-    item.children[1].graphics._strokeStyle.width = width
-  })
+function setStrokeWidth(item, width, pure) {
+  // _.times(item.totalFrames, frameIndex => {
+  //   item.gotoAndStop(frameIndex) 
+  //   item.children[1].graphics._strokeStyle.width = width
+  // })
+
+  if (pure) {
+    _.times(item.children.length, childIndex => {
+      _.times(item.totalFrames, frameIndex => {
+        item.gotoAndStop(frameIndex) 
+        item.children[childIndex].graphics._strokeStyle.width = width
+      })
+    })
+  } else {
+    _.times(item.totalFrames, frameIndex => {
+      item.gotoAndStop(frameIndex) 
+      item.children[1].graphics._strokeStyle.width = width
+    })
+  }
 }
 
 
