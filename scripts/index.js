@@ -14,9 +14,12 @@ let AALib = document.createElement("script")
 let scaler = 1
 let rate = 1
 let yPos = 0
-let xMoveRange = 100
-let yMoveRange = 100
+let xMoveRange = 150 
+let yMoveRange = 150
+let xMoveRangeSec = 300 
+let yMoveRangeSec = 300
 let items = []
+let secItems = []
 let arrPosX = 0
 let arrPosY = 0
 let maxItems = 5
@@ -27,23 +30,42 @@ let rotationRateMax = 0.5
 
 let primaryAssetData = [
   {name: "Pulsor0", playhead: "pingpong", fill: true, stroke:true},
-]
-
-let secondaryAssetData = [
+  {name: "BugmaAnchor", playhead: "pingpong", fill: true, stroke:true},
+  {name: "Pulsor0", playhead: "pingpong", fill: true, stroke:true},
   {name: "Looper0", playhead: "loop", fill: true, stroke:true},
-  {name: "Pulsor1", playhead: "pingpong", fill: true, stroke:true},
   {name: "Constellation0", playhead: "loop", fill: false, stroke:true, pureStrokes:false},
   {name: "Looper2", playhead: "loop", fill: true, stroke:false},
   {name: "Looper3", playhead: "loop", fill: true, stroke:false},
   {name: "Hairy0", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Features0", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Constellation1", playhead: "loop", fill: false, stroke:true, pureStrokes:false},
+
+]
+
+let secondaryAssetData = [
+  {name: "Sakkaya0", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya1", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya2", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya3", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya5", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya6", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya7", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya8", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya10", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya11", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya12", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya13", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya14", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya15", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya16", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
+  {name: "Sakkaya17", playhead: "loop", fill: false, stroke:true, pureStrokes:true},
 ]
 
 let assetID = Math.floor(fxrand()*primaryAssetData.length)
 
-
+let secAssetID = Math.floor(fxrand()*secondaryAssetData.length)
 
 let colorschemes = [
-
   ["590d22","800f2f","a4133c","c9184a","ff4d6d","ff758f","d2fd35","ffccd5","fff0f3"],
   ["d8f3dc","b7e4c7","ff0a50","74c69d","52b788","40916c","2d6a4f","1b4332","081c15"],
   ["007f5f","2b9348","55a630","80b918","aacc00","bfd200","eb4833","eeef20","ffff3f"],
@@ -59,15 +81,14 @@ let colorschemes = [
   ["78c0e0","449dd1","192bc2","150578","0e0e52","6eeb83","e4ff1a","ffb800","ff5714"],
   ["2d2a32","ddd92a","eae151","eeefa8","fafdf6","cc2936","6b818c","eee5e9","c7e8f3"],
   ["4d5057","4e6e5d","4da167","3bc14a","cfcfcf","ed1c24","fdfffc","f1d302","f2e2d2"]
-
-
 ]
 
 let colorScheme = fxSample(colorschemes)
+console.log("SCHEME: ", colorScheme)
 
-let color = "#" + fxSample(colorScheme)
+// let color = "#" + fxSample(colorScheme)
+let color = null
 let nestedColor = "#" + fxSample(colorScheme)
-
 
 AALib.setAttribute("src", "AA/pile-lib.js")
 document.body.appendChild(AALib)
@@ -87,12 +108,13 @@ function kickoff() {
   // let frameGraphics = new cjs.Graphics().beginStroke("white").drawRect(-350, -350, 700, 700)
   // let frameShape = new cjs.Shape(frameGraphics)
   // container.addChild(frameShape)
-
+  color = "#" + fxSample(colorScheme)
   items = _.times(numItems, makePulsor)
+  color = "#" + fxSample(colorScheme)
+  secItems = _.times(numItems, makeSegundo)
 
   cjs.Ticker.framerate = 30
   createjs.Ticker.addEventListener("tick", tick)
-
 
   // // BITMAP OVERLAY FAILED ATTEMPT
   // var bitmap = new createjs.Bitmap("images/scanlines1.png")
@@ -120,8 +142,23 @@ function recolor(item, itemData, color, depth) {
   if (itemData.fill) recolorFill(item, tempColor)
   if (itemData.stroke) {
     recolorStroke(item, strokeColor, itemData.pureStrokes)
-    setStrokeWidth(item, 2*depth, itemData.pureStrokes)
+    setStrokeWidth(item, 2 * depth, itemData.pureStrokes)
   }
+}
+
+function makeSegundo(index) {
+  if (fxrand() < 0.4) {
+    secAssetID = Math.floor(fxrand()*secondaryAssetData.length)
+  }
+  let itemData = secondaryAssetData[secAssetID]
+  let item = new lib[itemData.name]()
+  recolor(item, itemData, color)
+  item.play()
+  item.x = fxrand() * xMoveRangeSec - fxrand() * xMoveRangeSec
+  item.y = fxrand() * yMoveRangeSec - fxrand() * yMoveRangeSec
+  item.scaleX = fxrand() < 0.4 ? 1 : -1
+  item.rotation = fxrand()*360
+  container.addChildAt(item, Math.floor(fxrand()*container.children.length))
 }
 
 function makePulsor(index) {
@@ -132,12 +169,10 @@ function makePulsor(index) {
   // let className = "Pulsor"+ pulsorID
   // let className = "Pulsor)"
 
-
   if (fxrand() < 0.4) {
     assetID = Math.floor(fxrand()*primaryAssetData.length)
     
   }
-
 
   let itemData = primaryAssetData[assetID]
   // let itemData = assetData[1]
@@ -179,8 +214,6 @@ function makePulsor(index) {
     item.play()
   }
 
-
-
   item.x = fxrand() * xMoveRange - fxrand() * xMoveRange
   item.y = fxrand() * yMoveRange - fxrand() * yMoveRange
   // arrPosX += fxrand() * xMoveRange - fxrand() * xMoveRange
@@ -194,35 +227,38 @@ function makePulsor(index) {
   // let color = "#00ff00"
   container.addChildAt(item, 1)
 
+  if (item.anchor1) {
+    console.log("anchor found ")
+    makeNested(item)
+  } 
 
-
-  let nestedItemData = fxSample(secondaryAssetData)
-  // let nestedItemData = secondaryAssetData[2]
-  let nestedItem = new lib[nestedItemData.name]()
-  nestedItem.scaleX = nestedItem.scaleY = 0.5
-  let nestedItemForward = true
-  recolor(nestedItem, nestedItemData, nestedColor, 2)
-  nestedItem.gotoAndStop(Math.floor(fxrand()*item.totalFrames))
-  if (itemData.playhead == "pingpong") {
-    nestedItem.addEventListener('tick', e => {
-      if (nestedItemForward) {
-        nestedItem.gotoAndStop(nestedItem.currentFrame+rate)
-      } else {
-        nestedItem.gotoAndStop(nestedItem.currentFrame-rate)
-      }
-      if (nestedItem.currentFrame >= nestedItem.totalFrames - rate && nestedItemForward) {
-        nestedItemForward = false
-      } else if (nestedItem.currentFrame <= 0 && !nestedItemForward) {
-        nestedItemForward = true
-      }
-      // nestedItem.rotation += rotationRate
-    })
-  } else {
-    nestedItem.play()
+  function makeNested() {
+    let nestedItemData = fxSample(primaryAssetData)
+    // let nestedItemData = secondaryAssetData[2]
+    let nestedItem = new lib[nestedItemData.name]()
+    nestedItem.scaleX = nestedItem.scaleY = 0.5
+    let nestedItemForward = true
+    recolor(nestedItem, nestedItemData, nestedColor, 1)
+    nestedItem.gotoAndStop(Math.floor(fxrand()*item.totalFrames))
+    if (itemData.playhead == "pingpong") {
+      nestedItem.addEventListener('tick', e => {
+        if (nestedItemForward) {
+          nestedItem.gotoAndStop(nestedItem.currentFrame+rate)
+        } else {
+          nestedItem.gotoAndStop(nestedItem.currentFrame-rate)
+        }
+        if (nestedItem.currentFrame >= nestedItem.totalFrames - rate && nestedItemForward) {
+          nestedItemForward = false
+        } else if (nestedItem.currentFrame <= 0 && !nestedItemForward) {
+          nestedItemForward = true
+        }
+        // nestedItem.rotation += rotationRate
+      })
+    } else {
+      nestedItem.play()
+    }
+    item.anchor1.addChild(nestedItem)
   }
-  item.anchor1.addChild(nestedItem)
-
-
 
   return item
 }
@@ -251,7 +287,7 @@ function recolorStroke(item, color, pure) {
       item.children[1].graphics._stroke.style = color
     })
   }
-  console.log("chasdoij", item.children)
+  // console.log("chasdoij", item.children)
 
 }
 
@@ -264,7 +300,7 @@ function setStrokeWidth(item, width, pure) {
   if (pure) {
     _.times(item.children.length, childIndex => {
       _.times(item.totalFrames, frameIndex => {
-        item.gotoAndStop(frameIndex) 
+        item.gotoAndStop(frameIndex)
         item.children[childIndex].graphics._strokeStyle.width = width
       })
     })
