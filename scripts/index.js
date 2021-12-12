@@ -9,6 +9,10 @@ function fxSample(arr) {
 
 ///////////////////////////
 
+let capturer = null
+let captureIndex = 0
+let capturing = false
+
 let lib
 let AALib = document.createElement("script")
 let scaler = 1
@@ -113,23 +117,44 @@ function kickoff() {
   color = "#" + fxSample(colorScheme)
   secItems = _.times(numItems, makeSegundo)
 
+  capturer = new CCapture({
+    format: 'gif',
+    workersPath: 'libs/',
+    framerate: 30,
+    verbose: true
+  })
+
+  window.addEventListener("keydown", e => {
+    // console.log("KEY: ", e)
+    if (e.key == "b") {
+      console.log("BEGIN")
+      captureIndex = 0
+      capturing = true
+      capturer.start();
+    } else if (e.key == "e") { 
+      console.log("END")
+      capturing = false
+      capturer.stop();
+      capturer.save();
+    }
+  })
+
+  console.log("captureer: ", capturer)
+
   cjs.Ticker.framerate = 30
   createjs.Ticker.addEventListener("tick", tick)
-
-  // // BITMAP OVERLAY FAILED ATTEMPT
-  // var bitmap = new createjs.Bitmap("images/scanlines1.png")
-  // var g = new createjs.Graphics()
-  // g.beginBitmapFill(bitmap.image)
-  // g.drawCircle(0,0,300)
-  // var s = new createjs.Shape(g);
-  // s.x = container.x;
-  // s.y = container.y;
-  // stage.addChild(s);
-
 }
 
 function tick(e) {  
   stage.update()
+  capturer.capture(canvas);
+  if (capturing) {
+    captureIndex++
+    if (captureIndex == 95) {
+      capturer.stop();
+      capturer.save();
+    }
+  }
 }
 
 function recolor(item, itemData, color, depth) {
@@ -238,7 +263,7 @@ function makePulsor(index) {
     let nestedItem = new lib[nestedItemData.name]()
     nestedItem.scaleX = nestedItem.scaleY = 0.5
     let nestedItemForward = true
-    recolor(nestedItem, nestedItemData, nestedColor, 1)
+    recolor(nestedItem, nestedItemData, nestedColor, 2)
     nestedItem.gotoAndStop(Math.floor(fxrand()*item.totalFrames))
     if (itemData.playhead == "pingpong") {
       nestedItem.addEventListener('tick', e => {

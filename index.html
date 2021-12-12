@@ -15,8 +15,11 @@
     <script src="libs/createjs.min.js"></script>
     <script src="libs/lodash.core.min.js"></script>
     <script src="libs/pSBC.js"></script>
+    <script src="libs/CCapture.all.min.js"></script>
+    <!-- <script src="libs/tinykeys.js"></script> -->
 
     <script id="fxhash-snippet">
+
       //---- do not edit the following code (you can indent as you wish)
       let alphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
       var fxhash = "oo" + Array(49).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join('')
@@ -57,6 +60,29 @@
       let container = new cjs.Container()
       stage.addChild(container)
 
+
+      // let bitmap = new cjs.Bitmap("images/diamonds.png")
+      // // let bitmap = new cjs.Bitmap("images/hazenoise.png")
+      // let texture = new cjs.Shape()
+      // bitmap.image.onload = function() {
+      //   console.log("this", this.naturalWidth);
+        
+      //   texture.graphics.beginBitmapFill(bitmap.image, "repeat")
+      //   texture.graphics.drawRect(-4000,-4000,8000,8000)
+      //   context.imageSmoothingEnabled = false;
+      //   stage.addChildAt(texture, 1)
+      //   texture.compositeOperation = "overlay";
+      //   // texture.compositeOperation = "difference";
+      //   texture.scaleX = texture.scaleY = 1
+      //   texture.rotation = fxrand()*360
+      //   texture.alpha = 0.3
+      //   texture.addEventListener('tick', e => {
+      //     // console.log('TITITIITIT')
+      //     texture.rotation += 0.1
+      //   })
+      // }
+
+
       let onResize = () => {
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
@@ -69,6 +95,8 @@
         container.scaleY = scaler
         container.x = canvas.width / 2
         container.y = canvas.height / 2
+        // texture.x = canvas.width / 2
+        // texture.y = canvas.height / 2
 
         retinalize()
       }
